@@ -17,12 +17,65 @@ export class EditorComponent implements OnInit {
 
   contentOut = "";
 
+  errores:any = [];
+
+  simbolos:any = [];
+
+  optimizaciones:any = [];
+
+  /**==================================================================== */
   compile(){
-    this.http.post<any>('http://127.0.0.1:5000/Compile',{input:this.content}
+    this.http.post<any>('https://jolc-p2-bakcend.herokuapp.com//Compile',{input:this.content}
     ).subscribe((res)  => {
-      if(res.msg != 'ERROR') this.contentOut = res.msg
+      if(res.msg != 'ERROR'){
+        if (res.error.length != 0){
+          alert("Existen Errores :(");
+          this.errores = res.error;
+        } else {
+          this.contentOut = res.msg;
+          this.simbolos = res.simbols;
+        }
+      } 
       else this.contentOut = "ERROR"
     })
   }
+/**================================ */
+
+/**= */
+OptimizeMirilla(){
+  this.http.post<any>('https://jolc-p2-bakcend.herokuapp.com//optimize',{input:this.contentOut,type:'mirilla'}
+  ).subscribe((res)  => {
+    if(res.code == 500) this.contentOut = res.msg ;
+    else{
+      this.contentOut = res.msg;
+      this.optimizaciones = res.report;
+    } 
+  });
+}
+
+OptimizeBlock(){
+  this.http.post<any>('https://jolc-p2-bakcend.herokuapp.com//optimize',{input:this.contentOut,type:'block'}
+  ).subscribe((res)  => {
+    if(res.code == 500) this.contentOut = res.msg ;
+    else{
+      this.contentOut = res.msg;
+      this.optimizaciones = res.report;
+    } 
+  });
+}
+
+limpiar(){
+  this.content = "";
+
+  this.contentOut = "";
+
+  this.errores = [];
+
+  this.simbolos = [];
+
+  this.optimizaciones = [];
+}
+
+
 
 }
